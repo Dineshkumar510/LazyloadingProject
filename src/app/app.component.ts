@@ -12,51 +12,54 @@ export class AppComponent implements OnInit {
   @ViewChild('scrollTrigger') scrollTrigger!: ElementRef;
 
   results: any[] = [];
-  page = 10;
+  page = 5;
   assignedValue:any;
   contentValue:any;
   loading: boolean = false;
 
   ngOnInit(): void {
     //this.fetchApi();
-  }
-
-  constructor(private http: HttpClient, private DataManageServiceService : DataManageServiceService) {
     this.loadMoreResults();
   }
 
+  constructor(private http: HttpClient, private DataManageServiceService : DataManageServiceService) {
+
+  }
+
   loadMoreResults() {
+    this.loading = true;
     this.DataManageServiceService.getMoreResults(this.page).subscribe(
       (data: any) => {
-      this.results = this.results.concat(data.results);
+      this.results = this.results.concat(data);
       this.page++;
       this.assignedValue = data;
       console.log(this.assignedValue)
     });
+    this.loading = true;
   }
 
   @HostListener('window:scroll', ['$event'])
   onScroll() {
-    // this.loading = false;
     // setTimeout(()=> {
     //   if (this.bottomReached()) {
     //     this.loadMoreResults();
     //   }
-    //   this.loading = true;
     // }, 2000)
-    // this.loading = false;
 
-    setTimeout(()=> {
-      const triggerBottom = this.scrollTrigger.nativeElement.getBoundingClientRect().bottom;
-      if (triggerBottom <= window.innerHeight) {
-        this.loadMoreResults();
-      }
-    }, 2000)
+    if (
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 1
+    ) {
+      this.loadMoreResults();
+    }
+
+    // setTimeout(()=> {
+    //   const triggerBottom = this.scrollTrigger.nativeElement.getBoundingClientRect().bottom;
+    //   if (triggerBottom <= window.innerHeight) {
+    //     this.loadMoreResults();
+    //   }
+    // }, 2000)
 
   }
-
-
-
 
 
   private bottomReached(): boolean {
